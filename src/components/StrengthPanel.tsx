@@ -9,23 +9,19 @@ interface Exercise {
   key: keyof AppState['profile']['strengthBest']
   label: string
   unit: string
-  icon: string
-  maxRef: number // reference max for score calc
+  maxRef: number
 }
 
 const EXERCISES: Exercise[] = [
-  { key: 'pushup',  label: '腕立て',      unit: 'reps', icon: '💪', maxRef: 200 },
-  { key: 'situp',   label: '腹筋',        unit: 'reps', icon: '🔥', maxRef: 200 },
-  { key: 'squat',   label: 'スクワット',  unit: 'reps', icon: '⚡', maxRef: 200 },
-  { key: 'running', label: 'ランニング',  unit: 'km',   icon: '🏃', maxRef: 42  },
+  { key: 'pushup',  label: '腕立て',     unit: 'reps', maxRef: 200 },
+  { key: 'situp',   label: '腹筋',       unit: 'reps', maxRef: 200 },
+  { key: 'squat',   label: 'スクワット', unit: 'reps', maxRef: 200 },
+  { key: 'running', label: 'ランニング', unit: 'km',   maxRef: 42  },
 ]
 
 function calcStrength(best: AppState['profile']['strengthBest']): number {
-  const scores = EXERCISES.map(e => {
-    const v = best[e.key]
-    return Math.min(100, Math.round((v / e.maxRef) * 100))
-  })
-  return scores.reduce((a, b) => a + b, 0) // 0–400
+  return EXERCISES.map(e => Math.min(100, Math.round((best[e.key] / e.maxRef) * 100)))
+    .reduce((a, b) => a + b, 0)
 }
 
 function strengthRank(score: number): string {
@@ -46,110 +42,125 @@ function strengthRank(score: number): string {
   return 'F'
 }
 
-function strengthColor(score: number): string {
-  const pct = score / 400
-  if (pct >= 0.9) return '#f59e0b'
-  if (pct >= 0.7) return '#fb923c'
-  if (pct >= 0.5) return '#facc15'
-  if (pct >= 0.35) return '#34d399'
-  if (pct >= 0.2) return '#38bdf8'
-  return '#64748b'
-}
-
 export default function StrengthPanel({ strengthBest, onUpdate }: Props) {
   const score = calcStrength(strengthBest)
-  const rank = strengthRank(score)
-  const color = strengthColor(score)
-  const pct = Math.round((score / 400) * 100)
+  const rank  = strengthRank(score)
+  const pct   = Math.round((score / 400) * 100)
 
   return (
-    <div className="px-4 pb-8 space-y-5 animate-fade-in">
+    <div className="px-3 pb-8 space-y-4 pop-in">
 
       {/* Score Card */}
-      <div className="rounded-2xl border border-[#1a1a2e] bg-[#0d0d18] p-5 text-center">
-        <p className="text-xs tracking-[0.25em] text-slate-500 uppercase mb-2">STRENGTH</p>
+      <div className="cyber-card rounded-none p-5 text-center">
+        <div className="corner-tr" /><div className="corner-bl" />
+        <div className="font-oswald text-[9px] tracking-[0.3em] mb-2" style={{ color: 'rgba(0,240,255,0.4)' }}>
+          STRENGTH_INDEX
+        </div>
+
         <div
-          className="text-6xl font-black tabular-nums"
-          style={{ color, textShadow: `0 0 30px ${color}80` }}
+          className="font-oswald text-6xl font-bold tabular-nums"
+          style={{ color: 'var(--neon)', textShadow: '0 0 30px var(--neon-glow)' }}
         >
           {score}
         </div>
-        <p className="text-slate-500 text-sm mt-1">
-          <span style={{ color }} className="font-bold">Rank {rank}</span>
-          <span className="mx-2 text-slate-700">·</span>
-          <span className="text-slate-600">/ 400</span>
+
+        <p className="font-oswald text-sm mt-1" style={{ color: 'rgba(0,240,255,0.5)' }}>
+          Rank <span style={{ color: 'var(--neon)' }}>{rank}</span>
+          <span className="mx-2" style={{ color: 'rgba(0,240,255,0.2)' }}>·</span>
+          <span style={{ color: 'rgba(0,240,255,0.3)' }}>/ 400</span>
         </p>
 
         {/* Score bar */}
-        <div className="mt-4 h-2 rounded-full bg-slate-800 overflow-hidden">
+        <div
+          className="relative mt-4 h-1.5 overflow-hidden"
+          style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(0,240,255,0.2)' }}
+        >
           <div
-            className="h-full rounded-full transition-all duration-700"
+            className="absolute inset-y-0 left-0 opacity-30 pointer-events-none"
+            style={{
+              width: '100%',
+              backgroundImage: 'linear-gradient(90deg, transparent 95%, rgba(0,240,255,0.5) 95%)',
+              backgroundSize: '10% 100%',
+            }}
+          />
+          <div
+            className="absolute inset-y-0 left-0 bar-shine transition-all duration-700"
             style={{
               width: `${pct}%`,
-              background: `linear-gradient(90deg, #3b5ef0, ${color})`,
-              boxShadow: `0 0 12px 2px ${color}60`,
+              background: 'var(--neon)',
+              boxShadow: '0 0 10px var(--neon)',
             }}
           />
         </div>
       </div>
 
       {/* Exercise inputs */}
-      <div className="space-y-3">
-        {EXERCISES.map(ex => {
-          const val = strengthBest[ex.key]
-          const exScore = Math.min(100, Math.round((val / ex.maxRef) * 100))
+      {EXERCISES.map(ex => {
+        const val = strengthBest[ex.key]
+        const exScore = Math.min(100, Math.round((val / ex.maxRef) * 100))
 
-          return (
-            <div
-              key={ex.key}
-              className="rounded-xl border border-[#1a1a2e] bg-[#0d0d18] p-4"
-            >
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-2">
-                  <span className="text-lg">{ex.icon}</span>
-                  <span className="text-sm font-semibold text-slate-300">{ex.label}</span>
-                </div>
-                <span className="text-xs text-slate-500">{exScore}/100pt</span>
-              </div>
+        return (
+          <div key={ex.key} className="cyber-card rounded-none p-4">
+            <div className="corner-tr" /><div className="corner-bl" />
 
-              <div className="flex items-center gap-3">
-                <input
-                  type="number"
-                  min={0}
-                  value={val || ''}
-                  placeholder="0"
-                  onChange={e => {
-                    const n = parseFloat(e.target.value)
-                    onUpdate(ex.key, isNaN(n) ? 0 : Math.max(0, n))
-                  }}
-                  className="
-                    flex-1 bg-[#080810] border border-[#1e1e35] rounded-lg
-                    px-3 py-2 text-white text-sm font-bold text-center
-                    outline-none focus:border-violet-500/60 transition-colors
-                  "
-                />
-                <span className="text-xs text-slate-500 w-8">{ex.unit}</span>
-              </div>
-
-              {/* Per-exercise bar */}
-              <div className="mt-3 h-1.5 rounded-full bg-slate-800 overflow-hidden">
-                <div
-                  className="h-full rounded-full transition-all duration-500"
-                  style={{
-                    width: `${exScore}%`,
-                    background: 'linear-gradient(90deg, #4f46e5, #7c3aed)',
-                    boxShadow: exScore > 0 ? '0 0 8px 1px rgba(124,58,237,0.5)' : 'none',
-                  }}
-                />
-              </div>
+            <div className="flex items-center justify-between mb-3">
+              <span
+                className="font-oswald text-xs tracking-[0.2em]"
+                style={{ color: 'var(--neon)', textShadow: '0 0 6px var(--neon-glow)' }}
+              >
+                [ {ex.label} ]
+              </span>
+              <span className="font-oswald text-[9px] tracking-widest" style={{ color: 'rgba(0,240,255,0.4)' }}>
+                {exScore}/100pt
+              </span>
             </div>
-          )
-        })}
-      </div>
 
-      <p className="text-center text-xs text-slate-600 px-4 leading-relaxed">
-        各種目の自己ベストを入力。<br />
-        腕立て・腹筋・スクワットは200回、ランニングは42kmを基準に算出。
+            <div className="flex items-center gap-3">
+              <input
+                type="number"
+                min={0}
+                value={val || ''}
+                placeholder="0"
+                onChange={e => {
+                  const n = parseFloat(e.target.value)
+                  onUpdate(ex.key, isNaN(n) ? 0 : Math.max(0, n))
+                }}
+                className="flex-1 font-oswald text-lg font-bold text-center outline-none transition-all"
+                style={{
+                  background: 'rgba(0,240,255,0.04)',
+                  border: '1px solid rgba(0,240,255,0.3)',
+                  color: 'var(--neon)',
+                  padding: '6px 12px',
+                  textShadow: '0 0 10px var(--neon-glow)',
+                }}
+                onFocus={e => { e.currentTarget.style.borderColor = 'var(--neon)'; e.currentTarget.style.boxShadow = '0 0 8px var(--neon-glow)' }}
+                onBlur={e =>  { e.currentTarget.style.borderColor = 'rgba(0,240,255,0.3)'; e.currentTarget.style.boxShadow = 'none' }}
+              />
+              <span className="font-oswald text-[10px] tracking-widest w-8" style={{ color: 'rgba(0,240,255,0.4)' }}>
+                {ex.unit}
+              </span>
+            </div>
+
+            {/* Bar */}
+            <div
+              className="relative mt-3 h-1"
+              style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(0,240,255,0.15)' }}
+            >
+              <div
+                className="absolute inset-y-0 left-0 transition-all duration-500"
+                style={{
+                  width: `${exScore}%`,
+                  background: 'var(--neon)',
+                  boxShadow: exScore > 0 ? '0 0 6px var(--neon)' : 'none',
+                }}
+              />
+            </div>
+          </div>
+        )
+      })}
+
+      <p className="font-oswald text-center text-[9px] tracking-widest leading-relaxed" style={{ color: 'rgba(0,240,255,0.25)' }}>
+        SYS.INFO: 腕立て・腹筋・スクワット200rep / ランニング42kmを基準に算出
       </p>
     </div>
   )

@@ -35,8 +35,8 @@ const TAB_ICONS: Record<Tab, JSX.Element> = {
 }
 
 const TAB_LABELS: Record<Tab, string> = {
-  quest: 'QUEST',
-  status: 'STATUS',
+  quest:    'QUEST',
+  status:   'STATUS',
   strength: 'STRENGTH',
 }
 
@@ -48,29 +48,34 @@ export default function App() {
   const rankColor = getRankColor(state.profile.rank)
 
   return (
-    <div className="flex flex-col h-full bg-[#050508] safe-top">
+    <div className="flex flex-col h-full safe-top" style={{ background: 'var(--bg)' }}>
+
       {/* ── Header ── */}
-      <header className="flex-shrink-0 px-4 pt-4 pb-2">
+      <header className="flex-shrink-0 px-4 pt-4 pb-2 border-b" style={{ borderColor: 'var(--border)' }}>
         <div className="flex items-start justify-between">
           <div>
-            <div className="flex items-center gap-2">
-              <h1 className="text-2xl font-black tracking-[0.3em] text-white">格</h1>
-              <span className="text-xs font-bold tracking-[0.4em] text-slate-500 mt-0.5">KAKU</span>
+            {/* System label */}
+            <div className="font-oswald text-[9px] tracking-[0.3em] mb-1" style={{ color: 'rgba(0,240,255,0.4)' }}>
+              SYSTEM NOTIFICATION
             </div>
-            <p className="text-xs text-slate-600 mt-0.5">
+            <div className="flex items-center gap-2">
+              <h1 className="text-2xl font-black tracking-[0.3em] text-white neon-text">格</h1>
+              <span className="font-oswald text-sm tracking-[0.4em] mt-0.5" style={{ color: 'var(--neon)' }}>KAKU</span>
+            </div>
+            <p className="text-[10px] tracking-widest mt-0.5" style={{ color: 'rgba(0,240,255,0.4)' }}>
               {formatDate(state.today.date)}
             </p>
           </div>
 
-          {/* Rank pill */}
+          {/* Rank badge */}
           <div className="flex flex-col items-end gap-0.5">
             <span
-              className={`text-lg font-black ${rankColor}`}
-              style={{ textShadow: '0 0 16px currentColor' }}
+              className={`font-oswald text-xl font-bold ${rankColor}`}
+              style={{ textShadow: '0 0 14px currentColor' }}
             >
               {state.profile.rank}
             </span>
-            <span className="text-xs text-slate-600">
+            <span className="font-oswald text-[10px] tracking-widest" style={{ color: 'rgba(0,240,255,0.4)' }}>
               Lv.{state.profile.level}
               {state.profile.name ? ` · ${state.profile.name}` : ''}
             </span>
@@ -78,16 +83,13 @@ export default function App() {
         </div>
       </header>
 
-      {/* ── AURA bar (always visible) ── */}
+      {/* ── AURA bar ── */}
       <div className="flex-shrink-0">
         <AuraBar doneCount={doneCount} />
       </div>
 
-      {/* ── Divider ── */}
-      <div className="flex-shrink-0 h-px bg-[#111120] mx-4" />
-
-      {/* ── Main content (scrollable) ── */}
-      <main className="flex-1 overflow-y-auto pt-4">
+      {/* ── Main content ── */}
+      <main className="flex-1 overflow-y-auto pt-3">
         {tab === 'quest' && (
           <QuestList done={state.today.done} onToggle={toggleQuest} />
         )}
@@ -111,22 +113,25 @@ export default function App() {
       </main>
 
       {/* ── Bottom tab bar ── */}
-      <nav className="flex-shrink-0 safe-bottom">
-        <div className="flex border-t border-[#111120]">
+      <nav className="flex-shrink-0 safe-bottom border-t" style={{ borderColor: 'var(--border)', background: 'rgba(5,8,16,0.95)' }}>
+        <div className="flex">
           {(['quest', 'status', 'strength'] as Tab[]).map(t => (
             <button
               key={t}
               onClick={() => setTab(t)}
-              className={`
-                flex-1 flex flex-col items-center justify-center gap-1 py-3
-                transition-colors duration-150
-                ${tab === t ? 'text-violet-400' : 'text-slate-600 hover:text-slate-400'}
-              `}
+              className="flex-1 flex flex-col items-center justify-center gap-1 py-3 transition-all duration-150 relative"
+              style={{
+                color: tab === t ? 'var(--neon)' : 'rgba(0,240,255,0.3)',
+                textShadow: tab === t ? '0 0 10px var(--neon-glow)' : 'none',
+              }}
             >
               {TAB_ICONS[t]}
-              <span className="text-[10px] font-bold tracking-widest">{TAB_LABELS[t]}</span>
+              <span className="font-oswald text-[9px] tracking-[0.2em]">{TAB_LABELS[t]}</span>
               {tab === t && (
-                <span className="absolute bottom-0 w-8 h-0.5 rounded-full bg-violet-500 opacity-80" />
+                <span
+                  className="absolute bottom-0 left-1/2 -translate-x-1/2 w-8 h-px"
+                  style={{ background: 'var(--neon)', boxShadow: '0 0 8px var(--neon)' }}
+                />
               )}
             </button>
           ))}

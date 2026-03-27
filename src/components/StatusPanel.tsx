@@ -13,13 +13,8 @@ interface Props {
 }
 
 export default function StatusPanel({
-  profile,
-  streak,
-  totalCompleted,
-  doneCount,
-  onSetRank,
-  onSetLevel,
-  onSetName,
+  profile, streak, totalCompleted, doneCount,
+  onSetRank, onSetLevel, onSetName,
 }: Props) {
   const [editingName, setEditingName] = useState(false)
   const [nameInput, setNameInput] = useState(profile.name)
@@ -30,7 +25,6 @@ export default function StatusPanel({
     onSetName(nameInput.trim() || 'HUNTER')
     setEditingName(false)
   }
-
   function submitLevel() {
     const v = parseInt(levelInput)
     if (!isNaN(v) && v >= 1) onSetLevel(v)
@@ -40,16 +34,24 @@ export default function StatusPanel({
   const rankColor = getRankColor(profile.rank)
 
   return (
-    <div className="px-4 pb-8 space-y-5 animate-fade-in">
+    <div className="px-3 pb-8 space-y-4 pop-in">
 
       {/* Profile Card */}
-      <div className="rounded-2xl border border-[#1a1a2e] bg-[#0d0d18] p-5">
+      <div className="cyber-card rounded-none p-5">
+        <div className="corner-tr" /><div className="corner-bl" />
+
+        {/* System label */}
+        <div className="font-oswald text-[9px] tracking-[0.3em] mb-3" style={{ color: 'rgba(0,240,255,0.35)' }}>
+          PLAYER_DATA.SYS
+        </div>
+
         {/* Name */}
-        <div className="flex items-center justify-between mb-4">
+        <div className="mb-5" style={{ borderBottom: '1px solid rgba(0,240,255,0.15)', paddingBottom: '12px' }}>
           {editingName ? (
             <input
               autoFocus
-              className="bg-transparent border-b border-violet-500 text-xl font-bold text-white outline-none w-full mr-3 pb-0.5"
+              className="bg-transparent text-xl font-bold text-white outline-none w-full pb-0.5"
+              style={{ borderBottom: '1px solid var(--neon)' }}
               value={nameInput}
               onChange={e => setNameInput(e.target.value)}
               onBlur={submitName}
@@ -59,68 +61,79 @@ export default function StatusPanel({
           ) : (
             <button
               onClick={() => { setNameInput(profile.name); setEditingName(true) }}
-              className="text-xl font-bold text-white tracking-widest hover:text-violet-300 transition-colors"
+              className="text-xl font-bold text-white tracking-widest transition-all"
+              style={{ textShadow: '0 0 10px rgba(0,240,255,0.3)' }}
             >
               {profile.name || 'TAP TO SET NAME'}
             </button>
           )}
         </div>
 
-        {/* Rank + Level row */}
-        <div className="flex items-stretch gap-4">
-          {/* Rank badge */}
+        {/* Rank + Level */}
+        <div className="flex gap-3">
+          {/* Rank */}
           <button
             onClick={() => setShowRankPicker(v => !v)}
-            className="flex-1 flex flex-col items-center justify-center rounded-xl border border-[#1e1e35] bg-[#080810] py-4 gap-1 hover:border-[#2a2a50] transition-colors"
+            className="flex-1 flex flex-col items-center justify-center py-5 gap-1 transition-all"
+            style={{ border: '1px solid rgba(0,240,255,0.3)', background: 'rgba(0,240,255,0.03)' }}
           >
-            <span className="text-xs tracking-[0.25em] text-slate-500 uppercase">Rank</span>
+            <span className="font-oswald text-[9px] tracking-[0.3em]" style={{ color: 'rgba(0,240,255,0.5)' }}>RANK</span>
             <span
-              className={`text-4xl font-black tracking-tight ${rankColor}`}
+              className={`font-oswald text-5xl font-bold ${rankColor}`}
               style={{ textShadow: '0 0 20px currentColor' }}
             >
               {profile.rank}
             </span>
-            <span className="text-[10px] text-slate-600 mt-0.5">タップで変更</span>
+            <span className="font-oswald text-[8px] tracking-widest" style={{ color: 'rgba(0,240,255,0.3)' }}>TAP TO CHANGE</span>
           </button>
 
           {/* Level */}
-          <div className="flex-1 flex flex-col items-center justify-center rounded-xl border border-[#1e1e35] bg-[#080810] py-4 gap-1">
-            <span className="text-xs tracking-[0.25em] text-slate-500 uppercase">Level</span>
+          <div
+            className="flex-1 flex flex-col items-center justify-center py-5 gap-1"
+            style={{ border: '1px solid rgba(0,240,255,0.3)', background: 'rgba(0,240,255,0.03)' }}
+          >
+            <span className="font-oswald text-[9px] tracking-[0.3em]" style={{ color: 'rgba(0,240,255,0.5)' }}>LEVEL</span>
             <input
-              className="text-4xl font-black text-center bg-transparent text-sky-400 outline-none w-full"
+              className="font-oswald text-5xl font-bold text-center bg-transparent outline-none w-full"
+              style={{ color: 'var(--neon)', textShadow: '0 0 20px var(--neon-glow)' }}
               value={levelInput}
               onChange={e => setLevelInput(e.target.value)}
               onBlur={submitLevel}
               onKeyDown={e => e.key === 'Enter' && (e.currentTarget as HTMLInputElement).blur()}
               type="number"
               min={1}
-              style={{ textShadow: '0 0 20px #38bdf8' }}
             />
           </div>
         </div>
 
         {/* Rank description */}
-        <p className="mt-3 text-xs text-slate-500 leading-relaxed px-1">
+        <p className="mt-3 text-xs leading-relaxed" style={{ color: 'rgba(0,240,255,0.4)' }}>
           {RANK_DEFINITIONS[profile.rank]}
         </p>
       </div>
 
-      {/* Rank picker modal */}
+      {/* Rank picker */}
       {showRankPicker && (
-        <div className="rounded-2xl border border-[#1a1a2e] bg-[#0d0d18] p-4">
-          <p className="text-xs tracking-widest text-slate-500 uppercase mb-3">ランクを選択</p>
+        <div className="cyber-card rounded-none p-4">
+          <div className="corner-tr" /><div className="corner-bl" />
+          <p className="font-oswald text-[9px] tracking-[0.3em] mb-3" style={{ color: 'rgba(0,240,255,0.5)' }}>
+            SELECT_RANK
+          </p>
           <div className="grid grid-cols-5 gap-2">
             {RANKS.map(r => (
               <button
                 key={r}
                 onClick={() => { onSetRank(r); setShowRankPicker(false) }}
-                className={`
-                  py-2 rounded-lg border text-sm font-bold transition-all
-                  ${r === profile.rank
-                    ? 'border-violet-500 bg-violet-500/20 text-violet-300'
-                    : 'border-[#1e1e35] bg-[#080810] text-slate-400 hover:border-[#3a3a60]'
-                  }
-                `}
+                className="py-2 font-oswald text-sm font-bold transition-all"
+                style={{
+                  border: r === profile.rank
+                    ? '1px solid var(--neon)'
+                    : '1px solid rgba(0,240,255,0.2)',
+                  background: r === profile.rank
+                    ? 'rgba(0,240,255,0.1)'
+                    : 'transparent',
+                  boxShadow: r === profile.rank ? '0 0 8px var(--neon-glow)' : 'none',
+                }}
               >
                 <span className={getRankColor(r)}>{r}</span>
               </button>
@@ -130,41 +143,32 @@ export default function StatusPanel({
       )}
 
       {/* Stats */}
-      <div className="grid grid-cols-3 gap-3">
-        <StatCard label="TODAY" value={`${doneCount}/25`} sub="quests" />
-        <StatCard
-          label="STREAK"
-          value={String(streak)}
-          sub={streak === 1 ? 'day' : 'days'}
-          accent
-        />
-        <StatCard label="TOTAL" value={String(totalCompleted)} sub="done" />
+      <div className="grid grid-cols-3 gap-2">
+        <StatCard label="TODAY"  value={`${doneCount}/25`} sub="quests" />
+        <StatCard label="STREAK" value={String(streak)} sub={streak === 1 ? 'day' : 'days'} accent />
+        <StatCard label="TOTAL"  value={String(totalCompleted)} sub="done" />
       </div>
     </div>
   )
 }
 
-function StatCard({
-  label,
-  value,
-  sub,
-  accent,
-}: {
-  label: string
-  value: string
-  sub: string
-  accent?: boolean
-}) {
+function StatCard({ label, value, sub, accent }: { label: string; value: string; sub: string; accent?: boolean }) {
   return (
-    <div className="flex flex-col items-center justify-center rounded-xl border border-[#1a1a2e] bg-[#0d0d18] py-4 gap-0.5">
-      <span className="text-[10px] tracking-widest text-slate-500 uppercase">{label}</span>
+    <div
+      className="flex flex-col items-center justify-center py-4 gap-0.5"
+      style={{ border: '1px solid rgba(0,240,255,0.25)', background: 'rgba(0,240,255,0.02)' }}
+    >
+      <span className="font-oswald text-[9px] tracking-[0.2em]" style={{ color: 'rgba(0,240,255,0.45)' }}>{label}</span>
       <span
-        className={`text-2xl font-black ${accent ? 'text-amber-400' : 'text-slate-200'}`}
-        style={accent ? { textShadow: '0 0 16px rgba(251,191,36,0.5)' } : undefined}
+        className="font-oswald text-2xl font-bold"
+        style={accent
+          ? { color: '#FFD700', textShadow: '0 0 14px rgba(255,215,0,0.6)' }
+          : { color: 'var(--neon)', textShadow: '0 0 10px var(--neon-glow)' }
+        }
       >
         {value}
       </span>
-      <span className="text-[10px] text-slate-600">{sub}</span>
+      <span className="font-oswald text-[9px] tracking-widest" style={{ color: 'rgba(0,240,255,0.25)' }}>{sub}</span>
     </div>
   )
 }

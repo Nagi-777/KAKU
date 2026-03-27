@@ -8,36 +8,51 @@ export default function AuraBar({ doneCount }: Props) {
   const pct = Math.round((doneCount / TOTAL_QUESTS) * 100)
 
   return (
-    <div className="px-4 py-3">
+    <div className="px-4 py-3" style={{ borderBottom: '1px solid rgba(0,240,255,0.15)' }}>
       <div className="flex items-center justify-between mb-1.5">
-        <span className="text-xs font-semibold tracking-[0.2em] text-slate-400 uppercase">
+        <span className="font-oswald text-[10px] tracking-[0.3em]" style={{ color: 'var(--neon)' }}>
           AURA
         </span>
-        <span className="text-xs font-bold text-slate-300">
+        <span className="font-oswald text-xs" style={{ color: 'rgba(0,240,255,0.6)' }}>
           <span className="text-white">{doneCount}</span>
-          <span className="text-slate-500"> / {TOTAL_QUESTS}</span>
+          <span style={{ color: 'rgba(0,240,255,0.3)' }}> / {TOTAL_QUESTS}</span>
         </span>
       </div>
-      <div className="relative h-2.5 rounded-full bg-slate-800 overflow-hidden">
+
+      {/* Bar track */}
+      <div
+        className="relative h-1.5 overflow-hidden"
+        style={{
+          background: 'rgba(255,255,255,0.04)',
+          border: '1px solid rgba(0,240,255,0.2)',
+        }}
+      >
+        {/* Grid ticks */}
         <div
-          className="absolute inset-y-0 left-0 rounded-full transition-all duration-500 ease-out"
+          className="absolute inset-0 pointer-events-none opacity-30"
+          style={{
+            backgroundImage: 'linear-gradient(90deg, transparent 95%, rgba(0,240,255,0.5) 95%)',
+            backgroundSize: '10% 100%',
+          }}
+        />
+        {/* Fill */}
+        <div
+          className="absolute inset-y-0 left-0 bar-shine transition-all duration-500 ease-out"
           style={{
             width: `${pct}%`,
-            background: 'linear-gradient(90deg, #3b5ef0 0%, #7b4fef 60%, #a855f7 100%)',
-            boxShadow: pct > 0 ? '0 0 12px 2px rgba(123,79,239,0.6)' : 'none',
+            background: 'var(--neon)',
+            boxShadow: pct > 0 ? '0 0 10px var(--neon)' : 'none',
           }}
         />
       </div>
+
       <div className="flex justify-end mt-1">
-        <span
-          className="text-xs font-bold"
-          style={{
-            color: pct === 100 ? '#a855f7' : '#5a6080',
-          }}
-        >
+        <span className="font-oswald text-[10px] tracking-widest" style={{ color: 'rgba(0,240,255,0.4)' }}>
           {pct}%
           {pct === 100 && (
-            <span className="ml-1 text-amber-400">✦ COMPLETE</span>
+            <span className="ml-2 glitch-text" style={{ color: '#FFD700', textShadow: '0 0 10px #FFD700' }}>
+              ✦ COMPLETE
+            </span>
           )}
         </span>
       </div>
